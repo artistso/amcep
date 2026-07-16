@@ -5,14 +5,14 @@ from __future__ import annotations
 
 import argparse
 import csv
-from dataclasses import asdict
-from datetime import UTC, datetime
 import hashlib
 import json
 import os
-from pathlib import Path
 import platform
 import sys
+from dataclasses import asdict
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from src.synthetic_benchmark import (

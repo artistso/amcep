@@ -187,6 +187,21 @@ def test_squashed_cumulative_score_approaches_lasting_penalty() -> None:
     )
 
 
+def test_nonfinite_arithmetic_fails_closed() -> None:
+    state = AMCEPState(
+        rho=1e308,
+        operator_power=0.0,
+        x=1.0,
+        n=1,
+        normalization=1.0,
+        penalty_weight=1e308,
+    )
+    with pytest.raises(UnsafeDomainError, match="nonfinite"):
+        safe_transient_score(state, reject_contract())
+    with pytest.raises(UnsafeDomainError, match="nonfinite"):
+        safe_cumulative_score(state, reject_contract())
+
+
 def test_contract_and_scale_validation() -> None:
     invalid_policy = SafeScoreContract(
         normalization_floor=1.0,
@@ -206,6 +221,10 @@ def test_contract_and_scale_validation() -> None:
         rescale_state(base_state(), 0.0)
     with pytest.raises(ValueError):
         reject_contract().rescaled(math.inf)
+    with pytest.raises(ValueError):
+        rescale_state(base_state(), 1e308)
+    with pytest.raises(ValueError):
+        SafeScoreContract(normalization_floor=1e308).rescaled(1e308)
 
 
 def test_persistence_rejects_nonfinite_or_negative_depth() -> None:

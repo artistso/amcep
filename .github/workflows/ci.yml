@@ -48,6 +48,8 @@ jobs:
           test -s styles.css
           test -s app.js
           grep -q "Falsification Lab" index.html
+          grep -q 'id="transient"' index.html
+          grep -q 'id="cumulative"' index.html
           node --check app.js
 
       - name: Reject absolute local asset references
@@ -63,6 +65,18 @@ jobs:
           test -s research/definitions.md
           test -s research/assumptions.md
           test -s research/empirical-protocol.md
+          test -s research/topology-audit.md
+          test -s research/quantum-audit.md
+          test -s formal/README.md
           test -s data/claims.schema.json
           test -s data/claims.json
           test -s models/model-registry.json
+
+      - name: Require deployment and agent-readable artifacts
+        run: |
+          test -s netlify.toml
+          test -s robots.txt
+          test -s sitemap.xml
+          test -s llms.txt
+          grep -q 'amcep-lab.netlify.app' robots.txt
+          grep -q 'data/claims.json' llms.txt

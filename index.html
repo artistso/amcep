@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="AMCEP falsification-first mathematical audit laboratory.">
+  <title>AMCEP Falsification Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+<header class="shell hero">
+  <p class="eyebrow">AMCEP / OPEN AUDIT</p>
+  <h1>Claims survive by failing to break.</h1>
+  <p class="lede">This site separates definitions, proofs, computations, empirical hypotheses, and unsupported claims. It does not convert numerical output into theorem status.</p>
+  <div class="status"><span>Repository</span><strong>artistso/amcep · main</strong></div>
+</header>
+
+<main class="shell">
+  <section class="grid metrics" aria-label="Audit status">
+    <article><span>Fatal defects found</span><strong>1</strong><small>Contradiction-density sign</small></article>
+    <article><span>Required domain</span><strong>|x| &lt; 1</strong><small>unless ρ = 0</small></article>
+    <article><span>Millennium claims proved</span><strong>0</strong><small>No valid reduction or proof supplied</small></article>
+    <article><span>Operational tests</span><strong>6</strong><small>Boundary and property checks</small></article>
+  </section>
+
+  <section>
+    <div class="section-head"><div><p class="eyebrow">01 / LIVE CALCULATOR</p><h2>Original formula versus candidate repair</h2></div></div>
+    <div class="lab-grid">
+      <form id="calculator" class="panel controls">
+        <label>Contradiction density ρ<input id="rho" type="number" step="any" min="0" value="1"></label>
+        <label>Operator power T<input id="power" type="number" step="any" value="5"></label>
+        <label>Recursive factor x<input id="x" type="number" step="any" value="0.5"></label>
+        <label>Depth n<input id="n" type="number" step="1" min="0" value="10"></label>
+        <label>Normalization E<input id="E" type="number" step="any" value="1"></label>
+        <button type="submit">Run audit</button>
+      </form>
+      <div class="panel output" aria-live="polite">
+        <div><span>Original Sₙ</span><strong id="original">—</strong></div>
+        <div><span>Candidate S*ₙ</span><strong id="candidate">—</strong></div>
+        <div><span>∂Sₙ/∂ρ</span><strong id="derivative">—</strong></div>
+        <div><span>Residual convergence</span><strong id="convergence">—</strong></div>
+        <p id="finding" class="finding">Submit inputs to test the declared assumptions.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">02 / FIRST FAILURE</p>
+    <h2>The source formula rewards contradiction in its stated regime.</h2>
+    <div class="equation">Sₙ = (ρ + T − ρxⁿ) / E &nbsp;&nbsp; ⇒ &nbsp;&nbsp; ∂Sₙ/∂ρ = (1 − xⁿ) / E</div>
+    <p>For E &gt; 0, 0 ≤ x &lt; 1, and n &gt; 0, the derivative is positive. Increasing ρ increases the score. That directly contradicts the stated principle that increasing contradiction density should reduce rigor or certainty.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">03 / CLAIM LEDGER</p>
+    <h2>Status is attached to evidence, not rhetoric.</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Claim</th><th>Status</th><th>Current result</th></tr></thead>
+      <tbody>
+        <tr><td>ρxⁿ → 0</td><td><span class="tag conditional">Conditional</span></td><td>True only if ρ = 0 or |x| &lt; 1.</td></tr>
+        <tr><td>More operator power raises score</td><td><span class="tag proven">Algebraically proved</span></td><td>∂S/∂T = 1/E &gt; 0 when E &gt; 0.</td></tr>
+        <tr><td>More contradiction lowers score</td><td><span class="tag failed">Falsified</span></td><td>Opposite sign in the principal regime.</td></tr>
+        <tr><td>Lean examples verify AMCEP</td><td><span class="tag failed">Rejected inference</span></td><td>Evaluation is not a general theorem proof.</td></tr>
+        <tr><td>P = NP, Hodge, BSD</td><td><span class="tag unsupported">Unsupported</span></td><td>No complete formal statement, reduction, proof, or independent verification.</td></tr>
+        <tr><td>Ethical/quantum correspondence</td><td><span class="tag hypothesis">Hypothesis</span></td><td>Needs operational definitions, identifiability, and controlled experiments.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">04 / REAL-WORLD GATE</p>
+    <h2>Every principle must pass five independent gates.</h2>
+    <ol class="gates">
+      <li><strong>Semantic:</strong> variables map to measurable quantities without circular definitions.</li>
+      <li><strong>Mathematical:</strong> domains, units, invariants, limits, and counterexamples are explicit.</li>
+      <li><strong>Computational:</strong> reference code, property tests, and independent implementations agree.</li>
+      <li><strong>Empirical:</strong> preregistered datasets and baselines can falsify the prediction.</li>
+      <li><strong>Formal:</strong> Lean proves exact propositions without placeholders, axioms, or floating-point substitution.</li>
+    </ol>
+  </section>
+</main>
+<footer class="shell"><p>AMCEP Research Laboratory · falsification before promotion · evidence ledger on GitHub</p></footer>
+</body>
+</html>

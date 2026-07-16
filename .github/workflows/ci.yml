@@ -52,7 +52,7 @@ jobs:
 
       - name: Reject absolute local asset references
         run: |
-          if grep -RInE '(href|src)="/(?!/)' index.html; then
+          if grep -RInE '(href|src)="/[^/]' index.html; then
             echo 'Absolute local asset reference found'
             exit 1
           fi

@@ -1,0 +1,58 @@
+name: Robustness attack benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attack-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install research dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
+
+      - name: Lint and type-check attack implementation
+        run: |
+          ruff check experiments/robustness_attacks.py tests/test_robustness_attacks.py scripts/run_robustness_attacks.py
+          mypy --strict experiments/robustness_attacks.py scripts/run_robustness_attacks.py
+
+      - name: Run robustness tests
+        run: pytest tests/test_robustness_attacks.py -q
+
+      - name: Execute locked attack matrix
+        run: |
+          python scripts/run_robustness_attacks.py \
+            --output-dir results/robustness/ci \
+            --sample-size 400 \
+            --seed 20260716
+
+      - name: Validate reproducibility bundle
+        run: |
+          test -s results/robustness/ci/manifest.json
+          test -s results/robustness/ci/metrics.json
+          test -s results/robustness/ci/environment.txt
+          test -s results/robustness/ci/checksums.txt
+          python -m json.tool results/robustness/ci/manifest.json >/dev/null
+          python -m json.tool results/robustness/ci/metrics.json >/dev/null
+          cd results/robustness/ci
+          sha256sum --check checksums.txt
+
+      - name: Upload immutable robustness bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: amcep-robustness-${{ github.sha }}
+          path: results/robustness/ci
+          if-no-files-found: error
+          retention-days: 90

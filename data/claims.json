@@ -3,31 +3,33 @@
   "claims": [
     {
       "claim_id": "AMCEP-MON-001",
-      "statement": "For E > 0, increasing operator power T increases the original AMCEP score.",
-      "formal_statement": "For fixed rho, x, n, E with E > 0, dS/dT = 1/E > 0.",
-      "status": "conditionally-proved",
-      "assumptions": ["E > 0", "all scalar inputs are finite"],
-      "falsifier": "A valid state satisfying the assumptions for which increasing T does not increase S.",
+      "statement": "For E > 0, increasing operator power T strictly increases the original AMCEP score.",
+      "formal_statement": "For real rho, T1, T2, x, E and natural n, if T1 < T2 and E > 0, then originalScore rho T1 x E n < originalScore rho T2 x E n.",
+      "status": "formally-verified",
+      "assumptions": ["rho, T1, T2, x, and E are real", "n is natural", "T1 < T2", "E > 0"],
+      "falsifier": "A Lean-accepted counterexample satisfying the assumptions, or a failure of the pinned kernel build.",
       "evidence": [
         {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Core.lean"},
         {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
       ],
-      "version": "1.0.0",
+      "version": "1.1.0",
       "last_reviewed": "2026-07-16"
     },
     {
       "claim_id": "AMCEP-MON-002",
       "statement": "Increasing contradiction density rho lowers the original AMCEP score in the intended regime.",
-      "formal_statement": "For E > 0, 0 <= x < 1, n > 0, dS/drho = (1 - x^n)/E > 0, so the stated non-increasing property fails.",
+      "formal_statement": "For real rho1 < rho2, E > 0, and x^n < 1, originalScore rho1 T x E n < originalScore rho2 T x E n; therefore the stated non-increasing property fails.",
       "status": "falsified",
-      "assumptions": ["E > 0", "0 <= x < 1", "n > 0", "rho >= 0"],
-      "falsifier": "The derivative is positive throughout the declared regime; rho = 1 and rho = 2 at T = 5, x = 0.5, n = 10, E = 1 provide a concrete counterexample.",
+      "assumptions": ["rho1 and rho2 are real", "rho1 < rho2", "E > 0", "n is natural", "x^n < 1"],
+      "falsifier": "The exact Lean theorem proves the opposite monotonicity, and rho1 = 1, rho2 = 2, T = 5, x = 1/2, n = 10, E = 1 is a kernel-checked counterexample.",
       "evidence": [
         {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
-        {"kind": "counterexample", "artifact": "research/math-audit.md"},
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Core.lean"},
+        {"kind": "counterexample", "artifact": "formal/AMCEP/Core.lean"},
         {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
       ],
-      "version": "1.0.0",
+      "version": "1.1.0",
       "last_reviewed": "2026-07-16"
     },
     {
@@ -40,6 +42,19 @@
       "evidence": [
         {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
         {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-LIM-002",
+      "statement": "For real rho and x with |x| < 1, the residual rho*x^n tends to zero as n tends to infinity.",
+      "formal_statement": "For rho x : Real, |x| < 1 implies Tendsto (fun n : Nat => rho * x^n) atTop (nhds 0).",
+      "status": "formally-verified",
+      "assumptions": ["rho and x are real", "|x| < 1", "n ranges over natural numbers"],
+      "falsifier": "A Lean-accepted counterexample satisfying |x| < 1, or a failure of the pinned kernel build.",
+      "evidence": [
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Limits.lean"}
       ],
       "version": "1.0.0",
       "last_reviewed": "2026-07-16"
@@ -59,26 +74,58 @@
     {
       "claim_id": "AMCEP-CAN-001",
       "statement": "The transient candidate score is non-increasing in contradiction density.",
-      "formal_statement": "For S = (T - lambda*rho*|x|^n)/E with E > 0 and lambda >= 0, dS/drho = -lambda*|x|^n/E <= 0.",
-      "status": "conditionally-proved",
-      "assumptions": ["E > 0", "lambda >= 0", "n >= 0", "all scalar inputs are finite"],
-      "falsifier": "A valid state satisfying the assumptions for which dS/drho > 0.",
+      "formal_statement": "For real rho1 <= rho2, E > 0, and w >= 0, transientScore rho2 T x E w n <= transientScore rho1 T x E w n.",
+      "status": "formally-verified",
+      "assumptions": ["rho1 and rho2 are real", "rho1 <= rho2", "E > 0", "w >= 0", "n is natural"],
+      "falsifier": "A Lean-accepted counterexample satisfying the assumptions, or a failure of the pinned kernel build.",
       "evidence": [
         {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
-        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Core.lean"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"},
+        {"kind": "property-test", "artifact": "tests/test_properties.py"}
       ],
-      "version": "1.0.0",
+      "version": "1.1.0",
       "last_reviewed": "2026-07-16"
     },
     {
       "claim_id": "AMCEP-CAN-002",
       "statement": "The transient candidate preserves a lasting contradiction penalty when |x| < 1.",
-      "formal_statement": "lim_{n->infinity} (T - lambda*rho*|x|^n)/E = T/E.",
+      "formal_statement": "For real rho, T, x, E, and w with |x| < 1, transientScore rho T x E w n tends to T/E.",
       "status": "falsified",
-      "assumptions": ["E > 0", "lambda > 0", "rho > 0", "|x| < 1"],
-      "falsifier": "The contradiction term converges to zero and the limiting score is independent of rho.",
+      "assumptions": ["rho, T, x, E, and w are real", "|x| < 1"],
+      "falsifier": "The kernel-checked limit is T/E, which is independent of rho and w.",
       "evidence": [
-        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"}
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Limits.lean"}
+      ],
+      "version": "1.1.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-CAN-003",
+      "statement": "The cumulative candidate score is non-increasing in contradiction density when |x|^n <= 1.",
+      "formal_statement": "For real rho1 <= rho2, E > 0, w >= 0, and |x|^n <= 1, cumulativeScore rho2 T x E w n <= cumulativeScore rho1 T x E w n.",
+      "status": "formally-verified",
+      "assumptions": ["rho1 and rho2 are real", "rho1 <= rho2", "E > 0", "w >= 0", "n is natural", "|x|^n <= 1"],
+      "falsifier": "A Lean-accepted counterexample satisfying the assumptions, or a failure of the pinned kernel build.",
+      "evidence": [
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Core.lean"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"},
+        {"kind": "property-test", "artifact": "tests/test_properties.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-CAN-004",
+      "statement": "For |x| < 1, the cumulative candidate tends to (T - w*rho)/E.",
+      "formal_statement": "For real rho, T, x, E, and w with |x| < 1, cumulativeScore rho T x E w n tends to (T - w*rho)/E.",
+      "status": "formally-verified",
+      "assumptions": ["rho, T, x, E, and w are real", "|x| < 1"],
+      "falsifier": "A Lean-accepted counterexample satisfying |x| < 1, or a failure of the pinned kernel build.",
+      "evidence": [
+        {"kind": "formal-proof", "artifact": "formal/AMCEP/Limits.lean"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
       ],
       "version": "1.0.0",
       "last_reviewed": "2026-07-16"

@@ -66,7 +66,7 @@ The ledger uses controlled statuses:
 
 ```text
 proposed
-specified
+defined
 conditionally-proved
 formally-verified
 numerically-supported

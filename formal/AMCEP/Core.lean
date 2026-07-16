@@ -3,16 +3,16 @@ import Mathlib
 namespace AMCEP
 
 /-- The original AMCEP score exactly as stated in the source materials. -/
-def originalScore (ρ T x E : ℝ) (n : ℕ) : ℝ :=
+noncomputable def originalScore (ρ T x E : ℝ) (n : ℕ) : ℝ :=
   (ρ + T - ρ * x ^ n) / E
 
 /-- A transient contradiction-penalty candidate. -/
-def transientScore (ρ T x E λ : ℝ) (n : ℕ) : ℝ :=
-  (T - λ * ρ * |x| ^ n) / E
+noncomputable def transientScore (ρ T x E w : ℝ) (n : ℕ) : ℝ :=
+  (T - w * ρ * |x| ^ n) / E
 
 /-- A cumulative contradiction-penalty candidate. -/
-def cumulativeScore (ρ T x E λ : ℝ) (n : ℕ) : ℝ :=
-  (T - λ * ρ * (1 - |x| ^ n)) / E
+noncomputable def cumulativeScore (ρ T x E w : ℝ) (n : ℕ) : ℝ :=
+  (T - w * ρ * (1 - |x| ^ n)) / E
 
 /-- Exact difference identity for changing contradiction density in the original score. -/
 theorem originalScore_sub_originalScore
@@ -60,23 +60,23 @@ theorem originalScore_concrete_counterexample :
 
 /-- Exact difference identity for the transient candidate. -/
 theorem transientScore_sub_transientScore
-    (ρ₁ ρ₂ T x E λ : ℝ) (n : ℕ) :
-    transientScore ρ₂ T x E λ n - transientScore ρ₁ T x E λ n =
-      (-(λ * (ρ₂ - ρ₁) * |x| ^ n)) / E := by
+    (ρ₁ ρ₂ T x E w : ℝ) (n : ℕ) :
+    transientScore ρ₂ T x E w n - transientScore ρ₁ T x E w n =
+      (-(w * (ρ₂ - ρ₁) * |x| ^ n)) / E := by
   unfold transientScore
   ring
 
 /-- The transient candidate never rewards more contradiction under its declared domain. -/
 theorem transientScore_antitone_rho
-    {ρ₁ ρ₂ T x E λ : ℝ} {n : ℕ}
-    (hρ : ρ₁ ≤ ρ₂) (hE : 0 < E) (hλ : 0 ≤ λ) :
-    transientScore ρ₂ T x E λ n ≤ transientScore ρ₁ T x E λ n := by
-  have hterm : 0 ≤ λ * (ρ₂ - ρ₁) * |x| ^ n := by
+    {ρ₁ ρ₂ T x E w : ℝ} {n : ℕ}
+    (hρ : ρ₁ ≤ ρ₂) (hE : 0 < E) (hw : 0 ≤ w) :
+    transientScore ρ₂ T x E w n ≤ transientScore ρ₁ T x E w n := by
+  have hterm : 0 ≤ w * (ρ₂ - ρ₁) * |x| ^ n := by
     exact mul_nonneg
-      (mul_nonneg hλ (sub_nonneg.mpr hρ))
+      (mul_nonneg hw (sub_nonneg.mpr hρ))
       (pow_nonneg (abs_nonneg x) n)
   have hdiff :
-      transientScore ρ₂ T x E λ n - transientScore ρ₁ T x E λ n ≤ 0 := by
+      transientScore ρ₂ T x E w n - transientScore ρ₁ T x E w n ≤ 0 := by
     rw [transientScore_sub_transientScore, div_eq_mul_inv]
     exact mul_nonpos_of_nonpos_of_nonneg
       (neg_nonpos.mpr hterm)
@@ -85,24 +85,24 @@ theorem transientScore_antitone_rho
 
 /-- Exact difference identity for the cumulative candidate. -/
 theorem cumulativeScore_sub_cumulativeScore
-    (ρ₁ ρ₂ T x E λ : ℝ) (n : ℕ) :
-    cumulativeScore ρ₂ T x E λ n - cumulativeScore ρ₁ T x E λ n =
-      (-(λ * (ρ₂ - ρ₁) * (1 - |x| ^ n))) / E := by
+    (ρ₁ ρ₂ T x E w : ℝ) (n : ℕ) :
+    cumulativeScore ρ₂ T x E w n - cumulativeScore ρ₁ T x E w n =
+      (-(w * (ρ₂ - ρ₁) * (1 - |x| ^ n))) / E := by
   unfold cumulativeScore
   ring
 
 /-- The cumulative candidate never rewards more contradiction when `|x|^n ≤ 1`. -/
 theorem cumulativeScore_antitone_rho
-    {ρ₁ ρ₂ T x E λ : ℝ} {n : ℕ}
-    (hρ : ρ₁ ≤ ρ₂) (hE : 0 < E) (hλ : 0 ≤ λ)
+    {ρ₁ ρ₂ T x E w : ℝ} {n : ℕ}
+    (hρ : ρ₁ ≤ ρ₂) (hE : 0 < E) (hw : 0 ≤ w)
     (hx : |x| ^ n ≤ 1) :
-    cumulativeScore ρ₂ T x E λ n ≤ cumulativeScore ρ₁ T x E λ n := by
-  have hterm : 0 ≤ λ * (ρ₂ - ρ₁) * (1 - |x| ^ n) := by
+    cumulativeScore ρ₂ T x E w n ≤ cumulativeScore ρ₁ T x E w n := by
+  have hterm : 0 ≤ w * (ρ₂ - ρ₁) * (1 - |x| ^ n) := by
     exact mul_nonneg
-      (mul_nonneg hλ (sub_nonneg.mpr hρ))
+      (mul_nonneg hw (sub_nonneg.mpr hρ))
       (sub_nonneg.mpr hx)
   have hdiff :
-      cumulativeScore ρ₂ T x E λ n - cumulativeScore ρ₁ T x E λ n ≤ 0 := by
+      cumulativeScore ρ₂ T x E w n - cumulativeScore ρ₁ T x E w n ≤ 0 := by
     rw [cumulativeScore_sub_cumulativeScore, div_eq_mul_inv]
     exact mul_nonpos_of_nonpos_of_nonneg
       (neg_nonpos.mpr hterm)
@@ -111,14 +111,14 @@ theorem cumulativeScore_antitone_rho
 
 /-- At `x = 1`, the transient candidate retains its full contradiction penalty. -/
 theorem transientScore_at_one
-    (ρ T E λ : ℝ) (n : ℕ) :
-    transientScore ρ T 1 E λ n = (T - λ * ρ) / E := by
+    (ρ T E w : ℝ) (n : ℕ) :
+    transientScore ρ T 1 E w n = (T - w * ρ) / E := by
   simp [transientScore]
 
 /-- At `x = 1`, the cumulative candidate applies no accumulated penalty. -/
 theorem cumulativeScore_at_one
-    (ρ T E λ : ℝ) (n : ℕ) :
-    cumulativeScore ρ T 1 E λ n = T / E := by
+    (ρ T E w : ℝ) (n : ℕ) :
+    cumulativeScore ρ T 1 E w n = T / E := by
   simp [cumulativeScore]
 
 end AMCEP

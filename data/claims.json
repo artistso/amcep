@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0.0",
+  "claims": [
+    {
+      "claim_id": "AMCEP-MON-001",
+      "statement": "For E > 0, increasing operator power T increases the original AMCEP score.",
+      "formal_statement": "For fixed rho, x, n, E with E > 0, dS/dT = 1/E > 0.",
+      "status": "conditionally-proved",
+      "assumptions": ["E > 0", "all scalar inputs are finite"],
+      "falsifier": "A valid state satisfying the assumptions for which increasing T does not increase S.",
+      "evidence": [
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-MON-002",
+      "statement": "Increasing contradiction density rho lowers the original AMCEP score in the intended regime.",
+      "formal_statement": "For E > 0, 0 <= x < 1, n > 0, dS/drho = (1 - x^n)/E > 0, so the stated non-increasing property fails.",
+      "status": "falsified",
+      "assumptions": ["E > 0", "0 <= x < 1", "n > 0", "rho >= 0"],
+      "falsifier": "The derivative is positive throughout the declared regime; rho = 1 and rho = 2 at T = 5, x = 0.5, n = 10, E = 1 provide a concrete counterexample.",
+      "evidence": [
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "counterexample", "artifact": "research/math-audit.md"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-LIM-001",
+      "statement": "For fixed finite rho, rho times x to the n converges to zero exactly when rho is zero or the absolute value of x is less than one.",
+      "formal_statement": "lim_{n->infinity} rho*x^n = 0 iff rho = 0 or |x| < 1.",
+      "status": "conditionally-proved",
+      "assumptions": ["rho is a fixed finite real number", "x is real", "n ranges over natural numbers"],
+      "falsifier": "A finite real rho and real x outside the stated cases for which the limit is zero, or a case inside the stated domain for which it is not zero.",
+      "evidence": [
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-VER-001",
+      "statement": "A finite floating-point evaluation at n = 20 proves the infinite convergence claim.",
+      "status": "falsified",
+      "assumptions": [],
+      "falsifier": "A finite evaluation establishes only that one computed value crosses a chosen threshold; it does not establish the quantified epsilon-N definition of a limit.",
+      "evidence": [
+        {"kind": "counterexample", "artifact": "research/math-audit.md"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-CAN-001",
+      "statement": "The transient candidate score is non-increasing in contradiction density.",
+      "formal_statement": "For S = (T - lambda*rho*|x|^n)/E with E > 0 and lambda >= 0, dS/drho = -lambda*|x|^n/E <= 0.",
+      "status": "conditionally-proved",
+      "assumptions": ["E > 0", "lambda >= 0", "n >= 0", "all scalar inputs are finite"],
+      "falsifier": "A valid state satisfying the assumptions for which dS/drho > 0.",
+      "evidence": [
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"},
+        {"kind": "unit-test", "artifact": "tests/test_amcep.py"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-CAN-002",
+      "statement": "The transient candidate preserves a lasting contradiction penalty when |x| < 1.",
+      "formal_statement": "lim_{n->infinity} (T - lambda*rho*|x|^n)/E = T/E.",
+      "status": "falsified",
+      "assumptions": ["E > 0", "lambda > 0", "rho > 0", "|x| < 1"],
+      "falsifier": "The contradiction term converges to zero and the limiting score is independent of rho.",
+      "evidence": [
+        {"kind": "symbolic-proof", "artifact": "research/math-audit.md"}
+      ],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-EMP-001",
+      "statement": "AMCEP produces the reported percentage improvements over real-world baselines.",
+      "status": "unsupported",
+      "assumptions": ["a preregistered protocol exists", "raw data are available", "baselines are declared", "evaluation code is reproducible"],
+      "falsifier": "Failure to reproduce the reported effect on a locked test set or independent replication.",
+      "evidence": [],
+      "metrics": ["effect size", "confidence interval", "calibration error", "regret", "constraint violations"],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    },
+    {
+      "claim_id": "AMCEP-UNI-001",
+      "statement": "AMCEP solves P versus NP, the Hodge conjecture, the Birch and Swinnerton-Dyer conjecture, or establishes universal moral truth.",
+      "status": "unsupported",
+      "assumptions": [],
+      "falsifier": "Absence of a complete exact statement, proof artifact, verifier output, and independent mathematical review.",
+      "evidence": [],
+      "version": "1.0.0",
+      "last_reviewed": "2026-07-16"
+    }
+  ]
+}

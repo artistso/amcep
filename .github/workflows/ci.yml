@@ -11,16 +11,58 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - name: Run mathematical boundary tests
-        run: python -m unittest discover -s tests -v
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install research dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
+
+      - name: Lint Python
+        run: ruff check src tests
+
+      - name: Type-check executable model
+        run: mypy src
+
+      - name: Run unit and property tests
+        run: pytest --cov=src --cov-report=term-missing
+
+      - name: Validate claim ledger explicitly
+        run: pytest tests/test_claim_ledger.py -q
+
+      - name: Compile Python sources
+        run: python -m compileall -q src tests
+
       - name: Validate public site assets
         run: |
           test -s index.html
           test -s styles.css
           test -s app.js
           grep -q "Falsification Lab" index.html
+          node --check app.js
+
+      - name: Reject absolute local asset references
+        run: |
+          if grep -RInE '(href|src)="/(?!/)' index.html; then
+            echo 'Absolute local asset reference found'
+            exit 1
+          fi
+
+      - name: Require advertised research artifacts
+        run: |
+          test -s research/math-audit.md
+          test -s research/definitions.md
+          test -s research/assumptions.md
+          test -s research/empirical-protocol.md
+          test -s data/claims.schema.json
+          test -s data/claims.json
+          test -s models/model-registry.json

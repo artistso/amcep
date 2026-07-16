@@ -3,83 +3,149 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="AMCEP falsification-first mathematical audit laboratory.">
+  <meta name="description" content="AMCEP falsification-first mathematical and empirical research laboratory.">
+  <meta name="theme-color" content="#081012">
   <title>AMCEP Falsification Lab</title>
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to research content</a>
 <header class="shell hero">
   <p class="eyebrow">AMCEP / OPEN AUDIT</p>
   <h1>Claims survive by failing to break.</h1>
-  <p class="lede">This site separates definitions, proofs, computations, empirical hypotheses, and unsupported claims. It does not convert numerical output into theorem status.</p>
-  <div class="status"><span>Repository</span><strong>artistso/amcep · main</strong></div>
+  <p class="lede">AMCEP is being reconstructed as an auditable research program. This laboratory separates definitions, proofs, computations, empirical hypotheses, falsifications, and unsupported claims.</p>
+  <div class="status-row">
+    <div class="status"><span>Repository</span><strong>artistso/amcep · main</strong></div>
+    <div class="status"><span>Scientific status</span><strong>Research program · not a universal theorem</strong></div>
+  </div>
+  <nav class="artifact-links" aria-label="Research artifacts">
+    <a href="data/claims.json">Claim ledger</a>
+    <a href="research/math-audit.md">Mathematical audit</a>
+    <a href="research/empirical-protocol.md">Empirical protocol</a>
+    <a href="models/model-registry.json">Model registry</a>
+    <a href="https://github.com/artistso/amcep" rel="noreferrer">GitHub repository</a>
+  </nav>
 </header>
 
-<main class="shell">
+<main id="main" class="shell">
   <section class="grid metrics" aria-label="Audit status">
-    <article><span>Fatal defects found</span><strong>1</strong><small>Contradiction-density sign</small></article>
-    <article><span>Required domain</span><strong>|x| &lt; 1</strong><small>unless ρ = 0</small></article>
-    <article><span>Millennium claims proved</span><strong>0</strong><small>No valid reduction or proof supplied</small></article>
-    <article><span>Operational tests</span><strong>6</strong><small>Boundary and property checks</small></article>
+    <article><span>Original sign defects</span><strong>1</strong><small>Contradiction density is rewarded</small></article>
+    <article><span>Universal theorem claims</span><strong>0</strong><small>No validated universal result</small></article>
+    <article><span>Candidate score families</span><strong>2</strong><small>Transient and cumulative</small></article>
+    <article><span>Evidence authority</span><strong>Kernel + data</strong><small>Model output remains provisional</small></article>
   </section>
 
-  <section>
-    <div class="section-head"><div><p class="eyebrow">01 / LIVE CALCULATOR</p><h2>Original formula versus candidate repair</h2></div></div>
+  <section aria-labelledby="calculator-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">01 / INTERACTIVE STRESS TEST</p>
+        <h2 id="calculator-title">Compare the source equation with two explicit repairs.</h2>
+      </div>
+      <p class="section-note">The calculator evaluates formulas. It does not establish that any variable is measurable or that any candidate is a real-world law.</p>
+    </div>
     <div class="lab-grid">
       <form id="calculator" class="panel controls">
         <label>Contradiction density ρ<input id="rho" type="number" step="any" min="0" value="1"></label>
         <label>Operator power T<input id="power" type="number" step="any" value="5"></label>
         <label>Recursive factor x<input id="x" type="number" step="any" value="0.5"></label>
         <label>Depth n<input id="n" type="number" step="1" min="0" value="10"></label>
-        <label>Normalization E<input id="E" type="number" step="any" value="1"></label>
-        <button type="submit">Run audit</button>
+        <label>Normalization E<input id="E" type="number" step="any" min="0" value="1"></label>
+        <label>Penalty weight λ<input id="lambda" type="number" step="any" min="0" value="1"></label>
+        <button type="submit">Run falsification audit</button>
       </form>
       <div class="panel output" aria-live="polite">
-        <div><span>Original Sₙ</span><strong id="original">—</strong></div>
-        <div><span>Candidate S*ₙ</span><strong id="candidate">—</strong></div>
-        <div><span>∂Sₙ/∂ρ</span><strong id="derivative">—</strong></div>
+        <div><span>Original Sₙ</span><strong id="original">—</strong><small>(ρ + T − ρxⁿ) / E</small></div>
+        <div><span>Transient Sᵗₙ</span><strong id="transient">—</strong><small>(T − λρ|x|ⁿ) / E</small></div>
+        <div><span>Cumulative Sᶜₙ</span><strong id="cumulative">—</strong><small>(T − λρ(1 − |x|ⁿ)) / E</small></div>
+        <div><span>Bounded cumulative</span><strong id="bounded">—</strong><small>logistic(Sᶜₙ)</small></div>
+        <div><span>Original ∂S/∂ρ</span><strong id="original-derivative">—</strong></div>
+        <div><span>Transient ∂S/∂ρ</span><strong id="transient-derivative">—</strong></div>
+        <div><span>Cumulative ∂S/∂ρ</span><strong id="cumulative-derivative">—</strong></div>
         <div><span>Residual convergence</span><strong id="convergence">—</strong></div>
-        <p id="finding" class="finding">Submit inputs to test the declared assumptions.</p>
+        <p id="finding" class="finding">The default state is evaluated when this page loads.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <p class="eyebrow">02 / FIRST FAILURE</p>
-    <h2>The source formula rewards contradiction in its stated regime.</h2>
-    <div class="equation">Sₙ = (ρ + T − ρxⁿ) / E &nbsp;&nbsp; ⇒ &nbsp;&nbsp; ∂Sₙ/∂ρ = (1 − xⁿ) / E</div>
-    <p>For E &gt; 0, 0 ≤ x &lt; 1, and n &gt; 0, the derivative is positive. Increasing ρ increases the score. That directly contradicts the stated principle that increasing contradiction density should reduce rigor or certainty.</p>
+  <section aria-labelledby="failure-title">
+    <p class="eyebrow">02 / DECISIVE FAILURE</p>
+    <h2 id="failure-title">The source formula rewards contradiction in its intended regime.</h2>
+    <div class="equation">Sₙ = (ρ + T − ρxⁿ) / E &nbsp; ⇒ &nbsp; ∂Sₙ/∂ρ = (1 − xⁿ) / E</div>
+    <p>For E &gt; 0, 0 ≤ x &lt; 1, and n &gt; 0, the derivative is positive. Raising ρ raises the score. This is the opposite of the stated contradiction-penalty principle.</p>
+    <div class="callout failed-callout"><strong>Verdict:</strong> the original monotonicity claim is falsified. The equation remains available as a control and historical artifact.</div>
   </section>
 
-  <section>
-    <p class="eyebrow">03 / CLAIM LEDGER</p>
-    <h2>Status is attached to evidence, not rhetoric.</h2>
+  <section aria-labelledby="candidate-title">
+    <p class="eyebrow">03 / COMPETING MODELS</p>
+    <h2 id="candidate-title">A repaired sign is necessary, but not sufficient.</h2>
+    <div class="comparison-grid">
+      <article class="panel">
+        <h3>Transient penalty</h3>
+        <div class="equation compact">Sᵗₙ = (T − λρ|x|ⁿ) / E</div>
+        <p>Non-increasing in ρ when E &gt; 0 and λ ≥ 0. For |x| &lt; 1, the contradiction penalty disappears as n grows.</p>
+        <span class="tag conditional">Conditionally coherent</span>
+      </article>
+      <article class="panel">
+        <h3>Cumulative penalty</h3>
+        <div class="equation compact">Sᶜₙ = (T − λρ(1 − |x|ⁿ)) / E</div>
+        <p>Non-increasing in ρ for E &gt; 0, λ ≥ 0, and |x| ≤ 1. For |x| &lt; 1, the limiting penalty remains λρ/E.</p>
+        <span class="tag conditional">Conditionally coherent</span>
+      </article>
+    </div>
+    <p class="section-note">Neither model is promoted until ρ, T, E, λ, x, and n have operational definitions, compatible units, uncertainty models, preregistered baselines, and held-out results.</p>
+  </section>
+
+  <section aria-labelledby="ledger-title">
+    <p class="eyebrow">04 / CLAIM LEDGER</p>
+    <h2 id="ledger-title">Status is attached to evidence, not rhetoric.</h2>
     <div class="table-wrap"><table>
       <thead><tr><th>Claim</th><th>Status</th><th>Current result</th></tr></thead>
       <tbody>
-        <tr><td>ρxⁿ → 0</td><td><span class="tag conditional">Conditional</span></td><td>True only if ρ = 0 or |x| &lt; 1.</td></tr>
-        <tr><td>More operator power raises score</td><td><span class="tag proven">Algebraically proved</span></td><td>∂S/∂T = 1/E &gt; 0 when E &gt; 0.</td></tr>
-        <tr><td>More contradiction lowers score</td><td><span class="tag failed">Falsified</span></td><td>Opposite sign in the principal regime.</td></tr>
-        <tr><td>Lean examples verify AMCEP</td><td><span class="tag failed">Rejected inference</span></td><td>Evaluation is not a general theorem proof.</td></tr>
-        <tr><td>P = NP, Hodge, BSD</td><td><span class="tag unsupported">Unsupported</span></td><td>No complete formal statement, reduction, proof, or independent verification.</td></tr>
-        <tr><td>Ethical/quantum correspondence</td><td><span class="tag hypothesis">Hypothesis</span></td><td>Needs operational definitions, identifiability, and controlled experiments.</td></tr>
+        <tr><td>ρxⁿ → 0 for all real inputs</td><td><span class="tag failed">Falsified</span></td><td>For fixed finite ρ, convergence holds exactly when ρ = 0 or |x| &lt; 1.</td></tr>
+        <tr><td>Increasing T raises the original score</td><td><span class="tag proven">Conditionally proved</span></td><td>∂S/∂T = 1/E &gt; 0 when E &gt; 0.</td></tr>
+        <tr><td>Increasing ρ lowers the original score</td><td><span class="tag failed">Falsified</span></td><td>The derivative has the opposite sign in the intended regime.</td></tr>
+        <tr><td>A finite Float result proves a limit</td><td><span class="tag failed">Falsified</span></td><td>A finite computation is not an ε–N proof.</td></tr>
+        <tr><td>AMCEP is fully verified in Lean</td><td><span class="tag unsupported">Unsupported</span></td><td>No complete exact theorem set and kernel-checked artifact currently establishes the framework.</td></tr>
+        <tr><td>P = NP, Hodge, or BSD is solved</td><td><span class="tag unsupported">Unsupported</span></td><td>No complete formal statement, proof, or independent verification.</td></tr>
+        <tr><td>Ethical and quantum concepts form a natural isomorphism</td><td><span class="tag unsupported">Undefined</span></td><td>Required categories, functors, and natural transformation are absent.</td></tr>
+        <tr><td>Reported real-world percentage improvements</td><td><span class="tag unsupported">Unsupported</span></td><td>No locked protocol, raw data, uncertainty, or reproducible baseline comparison.</td></tr>
       </tbody>
     </table></div>
   </section>
 
-  <section>
-    <p class="eyebrow">04 / REAL-WORLD GATE</p>
-    <h2>Every principle must pass five independent gates.</h2>
+  <section aria-labelledby="gates-title">
+    <p class="eyebrow">05 / REAL-WORLD GATES</p>
+    <h2 id="gates-title">Every promoted principle must pass independent rejection gates.</h2>
     <ol class="gates">
-      <li><strong>Semantic:</strong> variables map to measurable quantities without circular definitions.</li>
-      <li><strong>Mathematical:</strong> domains, units, invariants, limits, and counterexamples are explicit.</li>
-      <li><strong>Computational:</strong> reference code, property tests, and independent implementations agree.</li>
-      <li><strong>Empirical:</strong> preregistered datasets and baselines can falsify the prediction.</li>
-      <li><strong>Formal:</strong> Lean proves exact propositions without placeholders, axioms, or floating-point substitution.</li>
+      <li><strong>Semantic:</strong> variables map to observable quantities without circular definitions.</li>
+      <li><strong>Dimensional:</strong> added and subtracted quantities have compatible units or explicit nondimensionalization.</li>
+      <li><strong>Mathematical:</strong> domains, invariants, limits, counterexamples, and boundary behavior are explicit.</li>
+      <li><strong>Computational:</strong> unit, property, adversarial, and independent implementation tests agree.</li>
+      <li><strong>Formal:</strong> Lean checks exact propositions over exact types without placeholders or convenience axioms.</li>
+      <li><strong>Empirical:</strong> a locked protocol, simple baselines, raw artifacts, and uncertainty can reject the prediction.</li>
+      <li><strong>Replication:</strong> an independent implementation reproduces the scoped result.</li>
     </ol>
   </section>
+
+  <section aria-labelledby="pipeline-title">
+    <p class="eyebrow">06 / MODEL-ASSISTED RESEARCH</p>
+    <h2 id="pipeline-title">Hugging Face models propose. Verifiers decide.</h2>
+    <div class="pipeline" role="list" aria-label="Verification pipeline">
+      <span role="listitem">Model proposal</span><b>→</b>
+      <span role="listitem">Exact statement</span><b>→</b>
+      <span role="listitem">Assumption audit</span><b>→</b>
+      <span role="listitem">Lean or executable artifact</span><b>→</b>
+      <span role="listitem">Adversarial review</span><b>→</b>
+      <span role="listitem">Ledger promotion</span>
+    </div>
+    <p>DeepSeek-Prover and Goedel-Prover are assigned independent proof-search roles. Qwen3 embeddings support retrieval. DeBERTa NLI supports contradiction triage. None of these models is a proof authority.</p>
+  </section>
 </main>
-<footer class="shell"><p>AMCEP Research Laboratory · falsification before promotion · evidence ledger on GitHub</p></footer>
+
+<footer class="shell">
+  <p>AMCEP Research Laboratory · falsification before promotion · negative results remain public</p>
+  <p><a href="https://github.com/artistso/amcep">Source and reproducibility artifacts</a></p>
+</footer>
 </body>
 </html>

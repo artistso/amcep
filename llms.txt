@@ -1,0 +1,56 @@
+# AMCEP Falsification-First Research Laboratory
+
+Repository: https://github.com/artistso/amcep
+Public target: https://amcep-lab.netlify.app
+
+AMCEP is an experimental framework for defining, falsifying, formally verifying, and empirically testing constrained decision metrics. It is not currently a universal theorem, physical law, moral authority, or solution to an open mathematical problem.
+
+## Decisive mathematical result
+
+Original source score:
+S_n(rho,T,x,E) = (rho + T - rho*x^n) / E
+
+For E > 0, 0 <= x < 1, and n > 0:
+dS_n/drho = (1 - x^n) / E > 0
+
+Therefore increasing contradiction density rho increases the original score. The stated contradiction-penalty principle is falsified in the intended regime.
+
+For fixed finite rho, rho*x^n tends to zero exactly when rho = 0 or |x| < 1.
+
+## Candidate models
+
+Transient:
+S_transient = (T - lambda*rho*|x|^n) / E
+This penalizes rho for E > 0 and lambda >= 0, but the penalty vanishes as n grows when |x| < 1.
+
+Cumulative:
+S_cumulative = (T - lambda*rho*(1 - |x|^n)) / E
+This penalizes rho for E > 0, lambda >= 0, and |x| <= 1. Its limiting penalty remains lambda*rho/E when |x| < 1.
+
+Neither candidate is empirically validated.
+
+## Evidence rules
+
+- A calculation is not a theorem.
+- A theorem is not empirical validation.
+- A model output is a candidate artifact, not proof.
+- Lean kernel acceptance is required for formally-verified status.
+- Locked protocols, raw data, uncertainty, and baseline comparisons are required for empirically-supported status.
+- Negative results, falsifications, and retractions remain public.
+
+## Primary machine-readable resources
+
+- /data/claims.json
+- /data/claims.schema.json
+- /models/model-registry.json
+- /research/math-audit.md
+- /research/definitions.md
+- /research/assumptions.md
+- /research/empirical-protocol.md
+- /research/topology-audit.md
+- /research/quantum-audit.md
+- /formal/README.md
+
+## Current unsupported claims
+
+No repository artifact currently establishes P = NP, the Hodge conjecture, the Birch and Swinnerton-Dyer conjecture, universal moral truth, a natural isomorphism between ethical and quantum systems, guaranteed unitarity from arbitrary ethical potentials, or infinite decoherence time.

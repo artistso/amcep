@@ -1,0 +1,60 @@
+{
+  "registry_version": "1.0.0",
+  "updated": "2026-07-16",
+  "policy": {
+    "proof_authority": "Lean kernel",
+    "model_outputs": "candidate artifacts only",
+    "promotion_requirement": "No model-generated statement, proof, contradiction label, or similarity score changes a claim status without independent verification and a reproducible artifact."
+  },
+  "models": [
+    {
+      "role": "primary-theorem-prover-large",
+      "repo_id": "deepseek-ai/DeepSeek-Prover-V2-671B",
+      "url": "https://hf.co/deepseek-ai/DeepSeek-Prover-V2-671B",
+      "task": "Generate candidate Lean proof strategies and formal statements.",
+      "acceptance_gate": "Lean compilation with pinned environment and no sorry."
+    },
+    {
+      "role": "primary-theorem-prover-local",
+      "repo_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+      "url": "https://hf.co/deepseek-ai/DeepSeek-Prover-V2-7B",
+      "task": "Lower-cost candidate proof generation and adversarial restatement.",
+      "acceptance_gate": "Lean compilation with pinned environment and no sorry."
+    },
+    {
+      "role": "independent-theorem-prover-large",
+      "repo_id": "Goedel-LM/Goedel-Prover-V2-32B",
+      "url": "https://hf.co/Goedel-LM/Goedel-Prover-V2-32B",
+      "task": "Independent proof search to reduce single-model dependence.",
+      "acceptance_gate": "Lean compilation and comparison against the primary prover result."
+    },
+    {
+      "role": "independent-theorem-prover-local",
+      "repo_id": "Goedel-LM/Goedel-Prover-V2-8B",
+      "url": "https://hf.co/Goedel-LM/Goedel-Prover-V2-8B",
+      "task": "Lower-cost independent proof search and counterexample prompts.",
+      "acceptance_gate": "Lean compilation and explicit assumptions."
+    },
+    {
+      "role": "retrieval-embedding-production",
+      "repo_id": "Qwen/Qwen3-Embedding-8B",
+      "url": "https://hf.co/Qwen/Qwen3-Embedding-8B",
+      "task": "Index papers, theorem statements, claims, experiments, and repository artifacts.",
+      "acceptance_gate": "Retrieval metrics on a labeled AMCEP query set; similarity is never treated as proof."
+    },
+    {
+      "role": "retrieval-embedding-low-cost",
+      "repo_id": "Qwen/Qwen3-Embedding-0.6B",
+      "url": "https://hf.co/Qwen/Qwen3-Embedding-0.6B",
+      "task": "Fast local indexing and regression tests.",
+      "acceptance_gate": "Recall and ranking evaluation against the production embedding model."
+    },
+    {
+      "role": "contradiction-triage",
+      "repo_id": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "url": "https://hf.co/MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "task": "Prioritize candidate textual entailments and contradictions for human or formal review.",
+      "acceptance_gate": "Calibrated evaluation on an AMCEP-specific labeled set; NLI output is not a logical proof."
+    }
+  ]
+}

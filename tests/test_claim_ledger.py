@@ -33,6 +33,15 @@ def test_verified_claims_require_formal_proof_artifact() -> None:
         assert "formal-proof" in kinds, claim["claim_id"]
 
 
+def test_numerical_claims_require_numerical_experiment() -> None:
+    ledger = json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
+    for claim in ledger["claims"]:
+        if claim["status"] != "numerically-supported":
+            continue
+        kinds = {item["kind"] for item in claim["evidence"]}
+        assert "numerical-experiment" in kinds, claim["claim_id"]
+
+
 def test_empirical_claims_require_empirical_artifact() -> None:
     ledger = json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
     for claim in ledger["claims"]:

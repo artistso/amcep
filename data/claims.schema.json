@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://artistso.github.io/amcep/data/claims.schema.json",
+  "title": "AMCEP claim ledger",
+  "type": "object",
+  "required": ["schema_version", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "claims": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/claim" }
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "defined",
+        "conditionally-proved",
+        "formally-verified",
+        "numerically-supported",
+        "empirically-supported",
+        "falsified",
+        "retracted",
+        "unsupported"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["kind", "artifact"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "definition",
+            "symbolic-proof",
+            "formal-proof",
+            "counterexample",
+            "unit-test",
+            "property-test",
+            "numerical-experiment",
+            "empirical-study",
+            "external-replication"
+          ]
+        },
+        "artifact": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "notes": { "type": "string" }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": [
+        "claim_id",
+        "statement",
+        "status",
+        "assumptions",
+        "falsifier",
+        "evidence",
+        "version"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "pattern": "^AMCEP-[A-Z]+-[0-9]{3}$"
+        },
+        "statement": { "type": "string", "minLength": 1 },
+        "formal_statement": { "type": "string" },
+        "status": { "$ref": "#/$defs/status" },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "falsifier": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "metrics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "owner": { "type": "string" },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "last_reviewed": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  }
+}

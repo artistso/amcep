@@ -65,14 +65,14 @@ theorem residual_at_one (ρ : ℝ) (n : ℕ) :
     ρ * (1 : ℝ) ^ n = ρ := by
   simp
 
-/-- At `x = -1`, the residual alternates between `ρ` and `-ρ`. -/
+/-- At `x = -1`, every even-index residual equals `ρ`. -/
 theorem residual_at_neg_one_even (ρ : ℝ) (n : ℕ) :
     ρ * (-1 : ℝ) ^ (2 * n) = ρ := by
-  ring_nf
+  simp [pow_mul]
 
-/-- At `x = -1`, every odd-index residual is `-ρ`. -/
+/-- At `x = -1`, every odd-index residual equals `-ρ`. -/
 theorem residual_at_neg_one_odd (ρ : ℝ) (n : ℕ) :
     ρ * (-1 : ℝ) ^ (2 * n + 1) = -ρ := by
-  ring_nf
+  simp [pow_add, pow_mul]
 
 end AMCEP

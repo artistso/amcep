@@ -51,10 +51,12 @@ class SafeScoreContract:
         """Return the same contract under a coherent task-value unit change."""
 
         _validate_scale_factor(factor)
-        return replace(
+        scaled = replace(
             self,
             normalization_floor=self.normalization_floor * factor,
         )
+        scaled.validate()
+        return scaled
 
 
 @dataclass(frozen=True)
@@ -73,17 +75,36 @@ def _validate_scale_factor(factor: float) -> None:
         raise ValueError("scale factor must be finite and strictly positive")
 
 
+def _require_finite(value: float, label: str) -> float:
+    if not math.isfinite(value):
+        raise UnsafeDomainError(f"{label} produced a nonfinite result")
+    return value
+
+
+def _strict_logistic(value: float) -> float:
+    """Return a floating result strictly inside the open unit interval."""
+
+    result = logistic(value)
+    if result <= 0.0:
+        return math.nextafter(0.0, 1.0)
+    if result >= 1.0:
+        return math.nextafter(1.0, 0.0)
+    return result
+
+
 def rescale_state(state: AMCEPState, factor: float) -> AMCEPState:
     """Coherently change the task-value unit used by ``T``, ``E``, and lambda."""
 
     state.validate()
     _validate_scale_factor(factor)
-    return replace(
+    scaled = replace(
         state,
         operator_power=state.operator_power * factor,
         normalization=state.normalization * factor,
         penalty_weight=state.penalty_weight * factor,
     )
+    scaled.validate()
+    return scaled
 
 
 def persistence_factor(
@@ -115,7 +136,10 @@ def persistence_factor(
             )
         return magnitude**n
 
-    squashed = magnitude / (1.0 + magnitude)
+    if magnitude <= 1.0:
+        squashed = magnitude / (1.0 + magnitude)
+    else:
+        squashed = 1.0 / (1.0 + 1.0 / magnitude)
     return squashed**n
 
 
@@ -132,6 +156,22 @@ def _validate_safe_request(
     return persistence_factor(state.x, state.n, contract)
 
 
+def _transient_raw(state: AMCEPState, persistence: float) -> float:
+    value = (
+        state.operator_power
+        - state.penalty_weight * state.rho * persistence
+    ) / state.normalization
+    return _require_finite(value, "transient score")
+
+
+def _cumulative_raw(state: AMCEPState, persistence: float) -> float:
+    value = (
+        state.operator_power
+        - state.penalty_weight * state.rho * (1.0 - persistence)
+    ) / state.normalization
+    return _require_finite(value, "cumulative score")
+
+
 def safe_transient_score(
     state: AMCEPState,
     contract: SafeScoreContract,
@@ -139,10 +179,7 @@ def safe_transient_score(
     """Evaluate the transient candidate under a fail-closed domain contract."""
 
     persistence = _validate_safe_request(state, contract)
-    return (
-        state.operator_power
-        - state.penalty_weight * state.rho * persistence
-    ) / state.normalization
+    return _transient_raw(state, persistence)
 
 
 def safe_cumulative_score(
@@ -152,10 +189,7 @@ def safe_cumulative_score(
     """Evaluate the cumulative candidate with non-negative penalty factor."""
 
     persistence = _validate_safe_request(state, contract)
-    return (
-        state.operator_power
-        - state.penalty_weight * state.rho * (1.0 - persistence)
-    ) / state.normalization
+    return _cumulative_raw(state, persistence)
 
 
 def safe_transient_d_score_d_rho(
@@ -165,7 +199,8 @@ def safe_transient_d_score_d_rho(
     """Exact rho derivative of the contracted transient candidate."""
 
     persistence = _validate_safe_request(state, contract)
-    return -(state.penalty_weight * persistence) / state.normalization
+    value = -(state.penalty_weight * persistence) / state.normalization
+    return _require_finite(value, "transient contradiction derivative")
 
 
 def safe_cumulative_d_score_d_rho(
@@ -175,9 +210,10 @@ def safe_cumulative_d_score_d_rho(
     """Exact rho derivative of the contracted cumulative candidate."""
 
     persistence = _validate_safe_request(state, contract)
-    return -(
+    value = -(
         state.penalty_weight * (1.0 - persistence)
     ) / state.normalization
+    return _require_finite(value, "cumulative contradiction derivative")
 
 
 def safe_bounded_transient_score(
@@ -186,9 +222,8 @@ def safe_bounded_transient_score(
 ) -> float:
     """Map the contracted transient score monotonically into ``(0, 1)``."""
 
-    contract.validate()
     raw = safe_transient_score(state, contract)
-    return logistic(raw / contract.output_temperature)
+    return _strict_logistic(raw / contract.output_temperature)
 
 
 def safe_bounded_cumulative_score(
@@ -197,9 +232,8 @@ def safe_bounded_cumulative_score(
 ) -> float:
     """Map the contracted cumulative score monotonically into ``(0, 1)``."""
 
-    contract.validate()
     raw = safe_cumulative_score(state, contract)
-    return logistic(raw / contract.output_temperature)
+    return _strict_logistic(raw / contract.output_temperature)
 
 
 def evaluate_safe_scores(
@@ -209,19 +243,13 @@ def evaluate_safe_scores(
     """Evaluate both candidate families once under the same validated policy."""
 
     persistence = _validate_safe_request(state, contract)
-    transient_raw = (
-        state.operator_power
-        - state.penalty_weight * state.rho * persistence
-    ) / state.normalization
-    cumulative_raw = (
-        state.operator_power
-        - state.penalty_weight * state.rho * (1.0 - persistence)
-    ) / state.normalization
+    transient_raw = _transient_raw(state, persistence)
+    cumulative_raw = _cumulative_raw(state, persistence)
     temperature = contract.output_temperature
     return SafeScoreEvaluation(
         transient_raw=transient_raw,
         cumulative_raw=cumulative_raw,
-        transient_bounded=logistic(transient_raw / temperature),
-        cumulative_bounded=logistic(cumulative_raw / temperature),
+        transient_bounded=_strict_logistic(transient_raw / temperature),
+        cumulative_bounded=_strict_logistic(cumulative_raw / temperature),
         persistence=persistence,
     )

@@ -6,10 +6,10 @@ sanity checks, not evidence that a regime describes the real world.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from dataclasses import dataclass, replace
 import math
 import random
+from collections.abc import Iterable
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from src.amcep import AMCEPState, cumulative_score, original_score, transient_score

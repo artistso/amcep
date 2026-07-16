@@ -1,4 +1,5 @@
-from hypothesis import assume, given, strategies as st
+from hypothesis import assume, given
+from hypothesis import strategies as st
 
 from src.amcep import (
     AMCEPState,

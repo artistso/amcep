@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from itertools import pairwise
 
 import pytest
 
@@ -34,8 +35,7 @@ def test_attack_sets_are_nested_for_shared_seed() -> None:
     attacked_sets = [attacked_project_ids(scenario) for scenario in scenarios]
     assert attacked_sets[0] == frozenset()
     assert all(
-        left.issubset(right)
-        for left, right in zip(attacked_sets, attacked_sets[1:])
+        left.issubset(right) for left, right in pairwise(attacked_sets)
     )
     persistent_ids = {
         project.project_id

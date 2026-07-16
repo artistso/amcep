@@ -1,100 +1,143 @@
-# AMCEP Formal Verification Plan
+# AMCEP Formal Verification
 
 ## Authority boundary
 
-Only artifacts accepted by the Lean kernel may support the ledger status `formally-verified`. Language-model output, floating-point evaluation, prose proofs, and successful unit tests belong to different evidence classes.
+Only exact propositions accepted by the pinned Lean kernel may support the ledger status `formally-verified`. Language-model output, floating-point evaluation, prose proofs, and successful unit tests remain separate evidence classes.
 
-## Planned module structure
+## Pinned environment
+
+```text
+Lean:    v4.32.0
+Mathlib: v4.32.0
+Package: formal/
+Build:   lake build
+```
+
+The GitHub Actions workflow installs the pinned toolchain, resolves the pinned Mathlib revision, rejects `sorry` and `admit` in the AMCEP theorem modules, runs `lake build`, and preserves diagnostic logs.
+
+## Current module structure
 
 ```text
 formal/
-  lakefile.toml
+  lakefile.lean
   lean-toolchain
+  AMCEP.lean
   AMCEP/
-    Domain.lean
-    OriginalScore.lean
-    Counterexamples.lean
-    TransientScore.lean
-    CumulativeScore.lean
-    Bounds.lean
-    Convergence.lean
-    Scale.lean
+    Core.lean
+    Limits.lean
 ```
 
-The Lean and Mathlib revisions will be pinned in the same pull request that introduces executable Lean code. No version is declared here until the environment is actually initialized and checked in CI.
-
-## First theorem set
+## Kernel-checked theorem set
 
 ### Original equation
 
-1. Define the score over exact real numbers.
-2. Prove positive responsiveness to `T` when `E > 0`.
-3. Prove that the original score increases with `rho` when `E > 0`, `0 <= x < 1`, and `n > 0`.
-4. Record a concrete exact counterexample.
-
-### Convergence
-
-Prove the exact domain for
+The library defines the source score over exact real numbers:
 
 ```text
-rho * x^n → 0
+originalScore rho T x E n = (rho + T - rho*x^n) / E
 ```
 
-with natural-number exponent and real parameters. The theorem must distinguish `rho = 0`, `|x| < 1`, boundary cases, oscillation, and divergence.
+It proves:
+
+- the exact score difference produced by changing `rho`;
+- the exact score difference produced by changing `T`;
+- strict increase in `T` when `E > 0`;
+- strict increase in `rho` when `rho1 < rho2`, `E > 0`, and `x^n < 1`;
+- an exact counterexample at `rho1 = 1`, `rho2 = 2`, `T = 5`, `x = 1/2`, `n = 10`, and `E = 1`.
+
+The contradiction-penalty principle for the original equation is therefore formally falsified in that domain.
+
+### Residual limits
+
+The library proves:
+
+- `rho*x^n` tends to zero for real `rho` and `x` when `|x| < 1`;
+- the residual is identically zero when `rho = 0`;
+- at `x = 1`, the residual remains constant;
+- at `x = -1`, even-index residuals equal `rho` and odd-index residuals equal `-rho`.
+
+The complete biconditional classification
+
+```text
+rho*x^n -> 0 iff rho = 0 or |x| < 1
+```
+
+is not yet promoted to `formally-verified`; the current files prove the positive domain and exact boundary identities but do not yet contain the complete converse for every `|x| > 1` case.
 
 ### Transient candidate
 
-Prove, under explicit hypotheses:
+The library defines
 
-- non-increasing behavior in `rho`;
-- limit equal to `T/E` for `|x| < 1`;
-- disappearance of the contradiction penalty.
+```text
+transientScore rho T x E w n = (T - w*rho*|x|^n) / E
+```
+
+and proves:
+
+- non-increasing behavior in `rho` for `E > 0` and `w >= 0`;
+- convergence to `T/E` when `|x| < 1`;
+- the resulting disappearance of the contradiction penalty in that limit;
+- exact behavior at `x = 1`.
 
 ### Cumulative candidate
 
-Prove, under explicit hypotheses:
+The library defines
 
-- non-increasing behavior in `rho` for `|x| <= 1`;
-- limit equal to `(T - lambda*rho)/E` for `|x| < 1`;
-- boundary behavior at `x = 1` and `x = -1`;
-- failure of the intended derivative sign outside the declared domain.
+```text
+cumulativeScore rho T x E w n = (T - w*rho*(1 - |x|^n)) / E
+```
 
-### Bounded transforms
+and proves:
 
-Prove the mathematical logistic transform lies strictly between zero and one for finite real input. Floating-point saturation to exact `0.0` or `1.0` is an implementation effect and must not be confused with the real-analysis theorem.
+- non-increasing behavior in `rho` for `E > 0`, `w >= 0`, and `|x|^n <= 1`;
+- convergence to `(T - w*rho)/E` when `|x| < 1`;
+- exact behavior at `x = 1`.
+
+These are mathematical properties of candidate functions. They do not establish empirical validity or moral authority.
+
+## Reproduction
+
+From the repository root:
+
+```bash
+cd formal
+lake update
+lake exe cache get
+lake build
+```
+
+The CI verifier result is attached to the exact pull-request commit. A claim is promoted only when `data/claims.json` names the exact theorem artifact supporting it.
 
 ## Prohibited shortcuts
 
 Formal files must not use:
 
 - `sorry`;
-- unreviewed custom axioms introduced to force the result;
+- `admit`;
+- unreviewed custom axioms introduced to force a result;
 - `Float` as a replacement for `Real` theorem statements;
 - a finite depth as a replacement for a limit;
 - an informal correspondence table as a categorical construction.
 
 ## Model-assisted workflow
 
-The registered Hugging Face theorem provers may propose statements and proof scripts. Every proposal must pass this pipeline:
+The registered Hugging Face theorem provers may propose statements and proof scripts. Every proposal must pass:
 
 ```text
 candidate statement
 → assumption audit
 → Lean elaboration
 → kernel check
-→ independent counterexample search
+→ counterexample search
 → claim-ledger update
 ```
 
-Two models producing the same answer does not create independent mathematical verification.
+Agreement between multiple language models is not independent mathematical verification.
 
-## CI gate
+## Remaining formal work
 
-Once initialized, CI must:
-
-1. install the pinned Lean toolchain;
-2. restore the Mathlib cache where appropriate;
-3. run `lake build`;
-4. reject `sorry` and prohibited declarations;
-5. attach the verifier result to the exact commit;
-6. allow `formally-verified` only when the relevant artifact path exists.
+- prove the full residual-convergence biconditional;
+- prove divergence for `|x| > 1` when `rho != 0`;
+- add bounded-transform real-analysis theorems;
+- add scale and dimensional-consistency theorems once units are formally represented;
+- separate the current modules into narrower domain, counterexample, candidate, and bounds modules as the theorem library grows.

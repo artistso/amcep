@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://amcep-lab.netlify.app/sitemap.xml

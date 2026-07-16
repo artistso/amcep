@@ -1,0 +1,58 @@
+name: Synthetic falsification benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install research dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
+
+      - name: Lint benchmark implementation
+        run: ruff check src/synthetic_benchmark.py tests/test_synthetic_benchmark.py scripts/run_synthetic_benchmark.py
+
+      - name: Run benchmark tests
+        run: pytest tests/test_synthetic_benchmark.py -q
+
+      - name: Execute locked synthetic sweep
+        run: |
+          python scripts/run_synthetic_benchmark.py \
+            --output-dir results/synthetic/ci \
+            --sample-size 300 \
+            --seed 20260716
+
+      - name: Validate reproducibility bundle
+        run: |
+          test -s results/synthetic/ci/manifest.json
+          test -s results/synthetic/ci/parameters.json
+          test -s results/synthetic/ci/metrics.json
+          test -s results/synthetic/ci/predictions.csv
+          test -s results/synthetic/ci/environment.txt
+          test -s results/synthetic/ci/checksums.txt
+          python -m json.tool results/synthetic/ci/manifest.json >/dev/null
+          python -m json.tool results/synthetic/ci/metrics.json >/dev/null
+          cd results/synthetic/ci
+          sha256sum --check checksums.txt
+
+      - name: Upload immutable benchmark bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: amcep-synthetic-${{ github.sha }}
+          path: results/synthetic/ci
+          if-no-files-found: error
+          retention-days: 90

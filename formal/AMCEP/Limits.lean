@@ -23,16 +23,16 @@ theorem residual_tendsto_zero_of_rho_zero (x : ℝ) :
 
 /-- The transient score forgets contradiction when `|x| < 1`. -/
 theorem transientScore_tendsto_task_only
-    (ρ T x E λ : ℝ) (hx : |x| < 1) :
-    Tendsto (fun n : ℕ ↦ transientScore ρ T x E λ n) atTop (𝓝 (T / E)) := by
+    (ρ T x E w : ℝ) (hx : |x| < 1) :
+    Tendsto (fun n : ℕ ↦ transientScore ρ T x E w n) atTop (𝓝 (T / E)) := by
   have hpow : Tendsto (fun n : ℕ ↦ |x| ^ n) atTop (𝓝 0) :=
     abs_pow_tendsto_zero hx
   have hscaled :
-      Tendsto (fun n : ℕ ↦ λ * ρ * |x| ^ n) atTop (𝓝 0) := by
+      Tendsto (fun n : ℕ ↦ w * ρ * |x| ^ n) atTop (𝓝 0) := by
     simpa [mul_assoc] using
       ((tendsto_const_nhds.mul tendsto_const_nhds).mul hpow)
   have hnum :
-      Tendsto (fun n : ℕ ↦ T - λ * ρ * |x| ^ n) atTop (𝓝 T) := by
+      Tendsto (fun n : ℕ ↦ T - w * ρ * |x| ^ n) atTop (𝓝 T) := by
     simpa using tendsto_const_nhds.sub hscaled
   simpa [transientScore, div_eq_mul_inv] using
     hnum.mul (tendsto_const_nhds :
@@ -40,21 +40,21 @@ theorem transientScore_tendsto_task_only
 
 /-- The cumulative score retains the limiting contradiction penalty when `|x| < 1`. -/
 theorem cumulativeScore_tendsto_lasting_penalty
-    (ρ T x E λ : ℝ) (hx : |x| < 1) :
-    Tendsto (fun n : ℕ ↦ cumulativeScore ρ T x E λ n) atTop
-      (𝓝 ((T - λ * ρ) / E)) := by
+    (ρ T x E w : ℝ) (hx : |x| < 1) :
+    Tendsto (fun n : ℕ ↦ cumulativeScore ρ T x E w n) atTop
+      (𝓝 ((T - w * ρ) / E)) := by
   have hpow : Tendsto (fun n : ℕ ↦ |x| ^ n) atTop (𝓝 0) :=
     abs_pow_tendsto_zero hx
   have honeSub :
       Tendsto (fun n : ℕ ↦ 1 - |x| ^ n) atTop (𝓝 1) := by
     simpa using tendsto_const_nhds.sub hpow
   have hscaled :
-      Tendsto (fun n : ℕ ↦ λ * ρ * (1 - |x| ^ n)) atTop (𝓝 (λ * ρ)) := by
+      Tendsto (fun n : ℕ ↦ w * ρ * (1 - |x| ^ n)) atTop (𝓝 (w * ρ)) := by
     simpa [mul_assoc] using
       ((tendsto_const_nhds.mul tendsto_const_nhds).mul honeSub)
   have hnum :
-      Tendsto (fun n : ℕ ↦ T - λ * ρ * (1 - |x| ^ n)) atTop
-        (𝓝 (T - λ * ρ)) := by
+      Tendsto (fun n : ℕ ↦ T - w * ρ * (1 - |x| ^ n)) atTop
+        (𝓝 (T - w * ρ)) := by
     simpa using tendsto_const_nhds.sub hscaled
   simpa [cumulativeScore, div_eq_mul_inv] using
     hnum.mul (tendsto_const_nhds :

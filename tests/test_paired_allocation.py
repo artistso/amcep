@@ -35,7 +35,7 @@ def test_attack_sets_are_nested_for_shared_seed() -> None:
     assert attacked_sets[0] == frozenset()
     assert all(
         left.issubset(right)
-        for left, right in zip(attacked_sets, attacked_sets[1:], strict=True)
+        for left, right in zip(attacked_sets, attacked_sets[1:])
     )
     persistent_ids = {
         project.project_id

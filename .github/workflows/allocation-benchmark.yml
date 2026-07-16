@@ -1,0 +1,84 @@
+name: Constrained allocation benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  allocation-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install research dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
+
+      - name: Lint and type-check allocation implementation
+        run: |
+          ruff check src/allocation_benchmark.py tests/test_allocation_benchmark.py scripts/run_allocation_benchmark.py
+          mypy --strict src/allocation_benchmark.py scripts/run_allocation_benchmark.py
+
+      - name: Run allocation tests
+        id: allocation-tests
+        continue-on-error: true
+        run: |
+          mkdir -p results/allocation/diagnostics
+          set -o pipefail
+          pytest tests/test_allocation_benchmark.py -vv --maxfail=1 \
+            --junitxml=results/allocation/diagnostics/junit.xml \
+            2>&1 | tee results/allocation/diagnostics/pytest.log
+
+      - name: Upload allocation test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amcep-allocation-diagnostics-${{ github.sha }}
+          path: results/allocation/diagnostics
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce allocation test gate
+        if: steps.allocation-tests.outcome != 'success'
+        run: exit 1
+
+      - name: Execute locked allocation matrix
+        run: |
+          python scripts/run_allocation_benchmark.py \
+            --output-dir results/allocation/ci \
+            --seed-start 20260716 \
+            --seed-count 30 \
+            --attack-rates 0,0.1,0.25,0.5 \
+            --bootstrap-resamples 1000
+
+      - name: Validate reproducibility bundle
+        run: |
+          test -s results/allocation/ci/manifest.json
+          test -s results/allocation/ci/config.json
+          test -s results/allocation/ci/scenarios.json
+          test -s results/allocation/ci/aggregates.json
+          test -s results/allocation/ci/environment.txt
+          test -s results/allocation/ci/checksums.txt
+          python -m json.tool results/allocation/ci/manifest.json >/dev/null
+          python -m json.tool results/allocation/ci/config.json >/dev/null
+          python -m json.tool results/allocation/ci/scenarios.json >/dev/null
+          python -m json.tool results/allocation/ci/aggregates.json >/dev/null
+          cd results/allocation/ci
+          sha256sum --check checksums.txt
+
+      - name: Upload immutable allocation bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: amcep-allocation-${{ github.sha }}
+          path: results/allocation/ci
+          if-no-files-found: error
+          retention-days: 90

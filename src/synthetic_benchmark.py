@@ -160,24 +160,29 @@ def generate_cases(config: SyntheticConfig) -> tuple[SyntheticCase, ...]:
             config.penalty_weight,
         )
 
-        observed_rho = min(
+        rho_observation = min(
             1.0, max(0.0, rho + rng.gauss(0.0, config.noise_std))
         )
-        observed_operator_power = operator_power + rng.gauss(
+        operator_power_observation = operator_power + rng.gauss(
             0.0, config.noise_std
         )
-        observed_x = min(
+        x_observation = min(
             0.999999,
             max(0.0, x + rng.gauss(0.0, config.noise_std / 2.0)),
         )
-        observed_normalization = max(
+        normalization_observation = max(
             1e-6,
             normalization + rng.gauss(0.0, config.noise_std / 4.0),
         )
 
         adversarial = rng.random() < config.adversarial_rate
         if adversarial:
-            observed_rho = 1.0 - observed_rho
+            rho_observation = 1.0 - rho_observation
+
+        observed_rho: float | None = rho_observation
+        observed_operator_power: float | None = operator_power_observation
+        observed_x: float | None = x_observation
+        observed_normalization: float | None = normalization_observation
 
         missing_field: str | None = None
         if rng.random() < config.missing_rate:

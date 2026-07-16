@@ -80,11 +80,14 @@ Means include deterministic percentile-bootstrap 95% intervals across independen
 - 16 projects per scenario;
 - cost budget 32;
 - persistent-risk budget 24;
-- 30 seeds beginning at `20260716`;
+- 30 base seeds beginning at `20260716`;
 - attack rates `0`, `0.1`, `0.25`, and `0.5`;
+- independent attack-rate seed blocks using `scenario_seed = base_seed + attack_index * 1,000,000`;
 - 1,000 bootstrap resamples;
 - complete scenario, project, oracle, and policy records retained;
 - environment and SHA-256 checksums retained.
+
+Attack-rate comparisons therefore use independently generated scenario blocks rather than paired latent projects. A paired-seed sensitivity analysis is a separate future experiment.
 
 Changing these values after observing results requires a new experiment identifier and new claim-ledger entry.
 

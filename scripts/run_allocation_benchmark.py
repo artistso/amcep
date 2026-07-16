@@ -27,6 +27,8 @@ from src.allocation_benchmark import (  # noqa: E402
     summarize_grid,
 )
 
+SEED_DERIVATION = "scenario_seed = base_seed + attack_index * 1000000"
+
 
 def _write_json(path: Path, payload: Any) -> None:
     path.write_text(
@@ -76,6 +78,7 @@ def run(
             "seed_start": seed_start,
             "seed_count": seed_count,
             "attack_rates": list(attack_rates),
+            "seed_derivation": SEED_DERIVATION,
             "bootstrap_resamples": bootstrap_resamples,
         },
     )
@@ -96,6 +99,7 @@ def run(
         "models": list(MODELS),
         "seed_start": seed_start,
         "seed_count": seed_count,
+        "seed_derivation": SEED_DERIVATION,
         "attack_rates": list(attack_rates),
         "scenario_count": len(scenarios),
         "bootstrap_resamples": bootstrap_resamples,

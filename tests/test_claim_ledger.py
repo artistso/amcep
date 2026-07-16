@@ -3,7 +3,6 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "data" / "claims.schema.json"
 LEDGER_PATH = ROOT / "data" / "claims.json"
